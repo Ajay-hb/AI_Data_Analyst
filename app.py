@@ -12,7 +12,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-ROOT = Path(__file__).resolve().parent
+ROOT.parent / "demand_forecasting.csv"
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
@@ -176,7 +176,10 @@ def main():
                 st.session_state.df = cleaned
                 st.session_state.profile = profile_dataframe(cleaned)
                 if st.session_state.workflow:
-                    st.session_state.workflow.close()
+                    try:
+                        st.session_state.workflow.close()
+                    except Exception:
+                        pass
                 st.session_state.workflow = AnalystWorkflow(cleaned)
                 st.session_state.clean_report = report
                 st.success("Cleaning complete.")
