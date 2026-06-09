@@ -3,7 +3,7 @@ Agentic AI Data Analyst — upload CSV, chat with data, charts, forecasts, PDF r
 Run: streamlit run app.py
 """
 from __future__ import annotations
-
+import uuid
 import os
 import sys
 from pathlib import Path
@@ -228,15 +228,19 @@ def main():
         if pending:
             question = pending
 
-        for msg in st.session_state.chat_history:
+        for i, msg in enumerate(st.session_state.chat_history):
             with st.chat_message(msg["role"]):
                 st.markdown(msg["content"])
                 if msg.get("code"):
                     st.code(msg["code"], language=msg.get("lang", "python"))
                 if msg.get("dataframe") is not None:
                     st.dataframe(msg["dataframe"], use_container_width=True)
-                if msg.get("chart"):
-                    st.plotly_chart(msg["chart"], use_container_width=True)
+                if msg.get("chart") is not None:
+                    st.plotly_chart(
+                        msg["chart"],
+                        use_container_width=True,
+                        key=msg.get("chart_id", f"chart_{i}")
+                    )
 
         if question:
             st.session_state.chat_history.append({"role": "user", "content": question})
@@ -286,6 +290,7 @@ def main():
                 "lang": "sql" if run_full.query and run_full.query.mode == "sql" else "python",
                 "dataframe": run_full.query.data if run_full.query and not run_full.query.error else None,
                 "chart": run_full.chart,
+                "chart_id": str(uuid.uuid4()),
             }
             st.session_state.chat_history.append(entry)
             st.rerun()
