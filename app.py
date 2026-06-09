@@ -147,7 +147,7 @@ def main():
 
         uploaded = st.file_uploader("Upload CSV", type=["csv"])
         if st.button("Load demo dataset"):
-            demo = demand_forecasting.csv()
+            demo = pd.read_csv("demand_forecasting.csv")
             if demo is not None:
                 st.session_state.df = demo
                 st.session_state.profile = profile_dataframe(demo)
