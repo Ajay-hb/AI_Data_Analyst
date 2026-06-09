@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import re
 import sqlite3
-from typing import Any
 
 import pandas as pd
 
@@ -16,34 +15,40 @@ class SQLTool:
         self.conn = sqlite3.connect(":memory:")
         df.to_sql(table_name, self.conn, index=False, if_exists="replace")
 
-     def schema(self) -> str:
-    
+    def schema(self) -> str:
         if self.conn is None:
             return "Database connection closed"
-    
+
         try:
             cur = self.conn.execute(
                 f"PRAGMA table_info({self.table_name})"
             )
             rows = cur.fetchall()
-    
+
             return "\n".join(
                 f"- {r[1]} ({r[2]})"
                 for r in rows
             )
-    
+
         except Exception:
             return "Database unavailable"
-        rows = cur.fetchall()
-        return "\n".join(f"- {r[1]} ({r[2]})" for r in rows)
 
     def execute(self, sql: str) -> pd.DataFrame:
         sql = sql.strip().rstrip(";")
+
         if not re.match(r"^\s*SELECT\b", sql, re.IGNORECASE):
             raise ValueError("Only SELECT queries are allowed.")
-        forbidden = re.compile(r"\b(DROP|DELETE|INSERT|UPDATE|ALTER|CREATE|ATTACH|DETACH)\b", re.I)
+
+        forbidden = re.compile(
+            r"\b(DROP|DELETE|INSERT|UPDATE|ALTER|CREATE|ATTACH|DETACH)\b",
+            re.I,
+        )
+
         if forbidden.search(sql):
-            raise ValueError("Only read-only SELECT queries are allowed.")
+            raise ValueError(
+                "Only read-only SELECT queries are allowed."
+            )
+
         return pd.read_sql_query(sql, self.conn)
 
     def close(self) -> None:
