@@ -12,9 +12,9 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-ROOT.parent / "demand_forecasting.csv"
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
 
 from agents.forecast_agent import forecast_series
 from agents.llm_client import get_llm
