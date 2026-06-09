@@ -16,8 +16,24 @@ class SQLTool:
         self.conn = sqlite3.connect(":memory:")
         df.to_sql(table_name, self.conn, index=False, if_exists="replace")
 
-    def schema(self) -> str:
-        cur = self.conn.execute(f"PRAGMA table_info({self.table_name})")
+     def schema(self) -> str:
+    
+        if self.conn is None:
+            return "Database connection closed"
+    
+        try:
+            cur = self.conn.execute(
+                f"PRAGMA table_info({self.table_name})"
+            )
+            rows = cur.fetchall()
+    
+            return "\n".join(
+                f"- {r[1]} ({r[2]})"
+                for r in rows
+            )
+    
+        except Exception:
+            return "Database unavailable"
         rows = cur.fetchall()
         return "\n".join(f"- {r[1]} ({r[2]})" for r in rows)
 
