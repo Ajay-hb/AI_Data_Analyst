@@ -31,7 +31,13 @@ class SQLTool:
         return pd.read_sql_query(sql, self.conn)
 
     def close(self) -> None:
-        self.conn.close()
+        if getattr(self, "conn", None) is not None:
+            try:
+                self.conn.close()
+            except Exception:
+                pass
+            finally:
+                self.conn = None
 
     def sample_queries(self) -> list[str]:
         return [
