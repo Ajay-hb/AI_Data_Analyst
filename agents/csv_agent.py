@@ -85,4 +85,8 @@ Write a single read-only SELECT query. Return ONLY a sql code block."""
             return QueryResult(question=question, mode="sql", code=sql, data=pd.DataFrame(), error=str(e))
 
     def close(self) -> None:
-        self.sql_tool.close()
+        if hasattr(self, "sql_tool") and self.sql_tool:
+            try:
+                self.sql_tool.close()
+            except Exception:
+                pass
