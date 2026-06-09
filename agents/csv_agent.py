@@ -71,6 +71,10 @@ Write a single read-only SELECT query. Return ONLY a sql code block."""
             return QueryResult(question=question, mode="pandas", code=code, data=pd.DataFrame(), error=str(e))
 
     def _run_sql(self, question: str) -> QueryResult:
+    
+        if getattr(self.sql_tool, "conn", None) is None:
+            self.sql_tool = SQLTool(self.df)
+    
         sql = None
         llm_text = llm_invoke(self._sql_prompt(question))
         if llm_text:
