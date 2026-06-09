@@ -59,4 +59,8 @@ class AnalystWorkflow:
         return run
 
     def close(self) -> None:
-        self.agent.close()
+        if hasattr(self, "agent") and self.agent:
+            try:
+                self.agent.close()
+            except Exception:
+                pass
